@@ -39,6 +39,34 @@ export class CandidatureService {
       }
     });
   }
+  async findOne(id: number) {
+    const candidature = await this.candidatureRepo.findOneBy({ id });
+    if (!candidature) throw new NotFoundException("candidature with this id : " + id + "not found");
+    return candidature
+  }
 
 
+
+  async updateStatus(id: number, status: CandStatus) {
+    let candidature = await this.candidatureRepo.findOneBy({ id });
+    await this.candidatureRepo.update(id, { status })
+    candidature!.status = status;
+    return candidature
+  }
+
+  private async checkCandidatureExiste(candidatId: number, offerId: number) {
+    const exist = await this.candidatureRepo.findOne({
+      where:
+      {
+        offer: { id: offerId },
+        candidat: { id: candidatId }
+      },
+
+    })
+    if (exist) throw new ConflictException("Candidature existed");
+    return exist
+  }
 }
+
+
+
