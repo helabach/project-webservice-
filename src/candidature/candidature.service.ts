@@ -22,7 +22,13 @@ export class CandidatureService {
     if (offer.createdBy.id === candidat.id) {
       throw new ConflictException('Cannot perform action on yourself');
     }
-
+    const today = new Date();
+    if (offer.deadline) {
+      const deadline = new Date(offer.deadline);
+      if (today > deadline) {
+        throw new ConflictException('The offer deadline has passed');
+      }
+    }
     const createCandidature = this.candidatureRepo.create({
       offer, candidat
     })
